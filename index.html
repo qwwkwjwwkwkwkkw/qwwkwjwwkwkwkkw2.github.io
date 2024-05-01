@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线HTML编辑器</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .editor, .preview {
+            width: 45%;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        #codeEditor {
+            height: 300px;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-theme .editor, .dark-theme .preview {
+            background-color: #444;
+            color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="editor">
+        <h2>编辑区</h2>
+        <div id="codeEditor"></div>
+    </div>
+    <div class="preview">
+        <h2>预览区</h2>
+        <iframe id="codePreview" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    </div>
+</div>
+
+<button id="themeToggle">切换深色模式</button>
+
+<script>
+    // 初始化ace-editor
+    var editor = ace.edit("codeEditor");
+    editor.setTheme("ace/theme/monokai"); // 使用monokai主题
+    editor.session.setMode("ace/mode/html"); // 设置为HTML模式
+    editor.setAutoScrollEditorIntoView(true); // 自动滚动到编辑器顶部
+    editor.renderer.setOption("wrap", true); // 启用自动换行
+    editor.setOptions({
+        enableBasicAutocompletion: true, // 启用基本代码补全
+        enableSnippets: true, // 启用代码片段
+        enableLiveAutocompletion: true // 启用实时代码补全
+    });
+
+    // 预览代码
+    function updatePreview() {
+        var code = editor.getValue();
+        var previewFrame = document.getElementById('codePreview');
+        var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        preview.open();
+        preview.write('<!DOCTYPE html><html><head><style>' + code + '</style></head><body></body></html>');
+        preview.close();
+    }
+
+    // 监听编辑器变化并更新预览
+    editor.getSession().on('change', function() {
+        updatePreview();
+    });
+
+    // 切换深浅色主题
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('dark-theme');
+        if (document.body.classList.contains('dark-theme')) {
+            editor.setTheme("ace/theme/monokai"); // 或者选择一个深色主题
+        } else {
+            editor.setTheme("ace/theme/monokai"); // 回到默认或浅色主题
+        }
+    });
+
+    // 初始化预览
+    updatePreview();
+</script>
+
+</body>
+</html>
