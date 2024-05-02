@@ -65,6 +65,7 @@
 <button id="saveButton">保存</button>
 <button id="importButton">导入上次编辑的代码</button>
 <button id="clearButton">清空代码</button>
+<button id="copyButton">复制代码</button>
     <span id="fileSizeDisplay">文件大小：0 B</span>
 <script>
     // 初始化ACE编辑器并设置其主题和模式
@@ -164,6 +165,51 @@
             var newSize = calculateFileSize();
             updateFileSize(newSize);
         });
+        // ... 其他JavaScript代码 ...
+
+/**
+ * 更新预览区的HTML内容，并尝试捕获并显示错误。
+ */
+function updatePreview() {
+    var code = editor.getValue();
+    var previewFrame = document.getElementById('codePreview');
+    var previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+
+    // 清除之前的错误信息
+    var errorDiv = previewDoc.getElementById('errorDisplay');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+
+    previewDoc.open();
+    
+    try {
+        // 使用DOMParser确保代码安全解析
+        var parser = new DOMParser();
+        var safeCode = parser.parseFromString('<!DOCTYPE html><html><head><style>' + code + '</style></head><body></body></html>', 'text/html').body.innerHTML;
+        previewDoc.write(safeCode);
+    } catch (e) {
+        // 如果有错误，写入错误信息到预览区
+        previewDoc.write('<div id="errorDisplay"><pre>Error: ' + e.message + '</pre></div>');
+    }
+
+    previewDoc.close();
+}
+    // ... 其他JavaScript代码 ...
+
+document.getElementById('copyButton').addEventListener('click', function() {
+    navigator.clipboard.writeText(editor.getValue())
+        .then(() => {
+            alert('代码已复制到剪贴板！');
+        })
+        .catch(err => {
+            console.error('复制代码失败:', err);
+        });
+});
+
+// ... 其他JavaScript代码 ...
+
 </script>
+</body>
 </body>
 </html>
